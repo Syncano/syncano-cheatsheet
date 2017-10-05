@@ -120,6 +120,55 @@ code, pre {
   }
 }
 
+.c-note {
+  background: #96c6ec;
+  border-radius: 4px;
+  padding: 10px 15px 10px;
+  position: relative;
+  padding-left: 50px;
+  margin-top: 8px;
+}
+
+.c-note svg {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-left: -35px;
+}
+
+.c-note p {
+  margin-top: 0;
+  color: #fff;
+}
+
+[data-type] {
+  position: relative;
+}
+
+[data-type]::after {
+  content: attr(data-type);
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 11px;
+  padding: 3px 4px 2px 4px;
+  text-shadow: none;
+  color: #fff;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: .05em; 
+}
+
+[data-type="socket"]::after {
+  background: #9291bf;
+}
+
+[data-type="server"]::after {
+  background: #7a9a99;
+}
+
 /* http://prismjs.com/download.html?themes=prism&languages=markup+css+clike+javascript */
 /**
  * prism.js default theme for JavaScript, CSS and HTML

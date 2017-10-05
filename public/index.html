@@ -42,19 +42,18 @@
       <pre><code class="lang-html">&lt;script src="https://unpkg.com/syncano-client"&gt;&lt;/script&gt;</code></pre>
       
       <h4>Basic connection</h4>
-      <pre><code class="lang-js">const s = new SyncanoClient('MY_INSTANCE_NAME')</code></pre>
+      <pre><code class="lang-js">const s = new SyncanoClient(instanceName)</code></pre>
       
       <h4>Connect with options</h4>
       <pre><code class="lang-js">const s = new SyncanoClient('MY_INSTANCE_NAME', {
-  host: 'api.syncano.io',
   token: 'USER_TOKEN'
 })</code></pre>
       
       <h3>Authentication</h3>
-      <h4>Set token</h4>
+      <h4>Set user token</h4>
       <pre><code class="lang-js">s.setToken(token)</code></pre>
       
-      <h4>Remove token</h4>
+      <h4>Remove user token</h4>
       <pre><code class="lang-js">s.setToken()</code></pre>
     </section>
     <!-- 
@@ -64,17 +63,22 @@
     -->
     <section data-tag="client" class="c-column">
       <h3>Requests</h3>
-      <h4>POST</h4>
-      <pre><code class="lang-js">s(endpoint, data?, options?)</code></pre>
-      <pre><code class="lang-js">s.post(endpoint, data?, options?)</code></pre>
-      <h4>GET</h4>
-      <pre><code class="lang-js">s.get(endpoint, data?, options?)</code></pre>
-      <h4>DELETE</h4>
-      <pre><code class="lang-js">s.delete(endpoint, data?, options?)</code></pre>
-      <h4>PUT</h4>
-      <pre><code class="lang-js">s.put(endpoint, data?, options?)</code></pre>
-      <h4>PATCH</h4>
-      <pre><code class="lang-js">s.patch(endpoint, data?, options?)</code></pre>
+      <h4>API</h4>
+      <pre><code class="lang-js">s(endpoint, data?, options?)
+s.post(endpoint, data?, options?)
+s.get(endpoint, data?, options?)
+s.delete(endpoint, data?, options?)
+s.put(endpoint, data?, options?)
+s.patch(endpoint, data?, options?)</code></pre>
+      <h4>Call socket endpoint</h4>
+      <pre><code class="lang-js">// Send POST request
+s('countries/list', {sort_by: 'population'})
+  .then(country => {
+    console.log(country.name)
+  })
+
+// Send GET request
+s.get('countries/get', {name: 'Poland'})</code></pre>
       <h4>Custom headers</h4>
       <pre><code class="lang-js">s.get('countries/list', {}, {
   headers: {
@@ -97,28 +101,26 @@ s.subscribe(endpoint, data?, callback)
 // Subscribe only for first change
 s.subscribe.once(endpoint, data?, callback)</code></pre>
       <h4>Listen for changes on public channel</h4>
-      <pre><code class="lang-js">s.subscribe('chat/messages', res => {})</code></pre>
-      <pre><code class="lang-yaml"># chat-socket/socket.yml
-endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages</code></pre>
-      <pre><code class="lang-js">// chat-socket/scripts/create-message.js
-import {channel} from 'syncano-server'
+      <pre data-type="server"><code class="lang-js">import {channel} from 'syncano-server'
 channel.publish(`messages`, message)</code></pre>
+      <pre><code class="lang-js">s.subscribe('chat/messages', res => {})</code></pre>
       <h4>Listen for changes on channel room</h4>
-      <pre><code class="lang-js">s.subscribe(endpoint, {room: 1}, callback)</code></pre>
-      <pre><code class="lang-yaml">endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages.{room}</code></pre>
-      <pre><code class="lang-js">channel.publish(`messages.${room}`, message)</code></pre>
+      <pre data-type="server"><code class="lang-js">channel.publish(`messages.${room}`, message)</code></pre>
+      <pre><code class="lang-js">s.subscribe(endpoint, {room: 1}, callback)</code></pre>
       
       
       <h4>Listen for changes on user private channel</h4>
-      <pre><code class="lang-js">s.subscribe(endpoint, {user_key: ''}, callback)</code></pre>
-      <pre><code class="lang-yaml">endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages.{user}</code></pre>
-      <pre><code class="lang-js">channel.publish(`messages.${username}`, message)</code></pre>
+      <pre data-type="server"><code class="lang-js">channel.publish(`messages.${username}`, message)</code></pre>
+      <pre><code class="lang-js">s.subscribe(endpoint, {user_key: ''}, callback)</code></pre>
       
       <h4>Unsubscribe from channel changes</h4>
       <pre><code class="lang-js">const listener = s.subscribe(endpoint, data)
@@ -141,17 +143,26 @@ listener.stop()
       <pre><code class="lang-bash">npm install syncano-server --save</code></pre>
       
       <h4>Usage</h4>
-      <pre><code class="lang-js">import {data, users, response} from 'syncano-server'
-data.posts.create({title: 'Lorem ipsum'})      
-</code></pre>
+      <pre><code class="lang-js">import Syncano from ‘syncano-server’
+          
+export default (ctx) => {
+  const {data} = new Syncano(ctx)
+
+  data.posts
+    .create({title: 'Lorem ipsum'})
+    .then(post => {
+      console.log(post.title)
+    })
+}</code></pre>
       <!-- 
 
       ==== Response
 
       -->
       <h3>Response</h3>
+      <p>Send response from socket.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {response} from 'syncano-server'</code></pre>
+      <pre><code class="lang-js">const {response} = new Server(ctx)</code></pre>
       <h4>API</h4>
       <pre><code class="lang-js">response(content, status?, mimetype, headers?)
 response.header(key, value)
@@ -165,7 +176,7 @@ response('Hello world', 200, 'text/plain', {
       <pre><code class="lang-js">response
   .header('X-RATE-LIMIT', 50)
   .header('X-USAGE', 35)
-  ('Check headers')</code></pre>
+  ('Check headers', 200, 'plain/text')</code></pre>
       <h4>JSON response</h4>
       <pre><code class="lang-js">response.json({title: "Post title"})
 response
@@ -179,9 +190,11 @@ response
       <h3>Logger</h3>
       <p>console.log for your sockets.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {logger} from 'syncano-server'</code></pre>
+      <pre><code class="lang-js">const {logger} = new Server(ctx)</code></pre>
       <h4>Usage</h4>
-      <pre><code class="lang-js">log.debug('This is debug message!')
+      <pre><code class="lang-js">const log = logger('Socket scope')
+
+log.debug('This is debug message!')
 log.error('This is error message!')
 log.warn('This is warning message!')
 log.info('This is info message!', {hello: "world"})</code></pre>
@@ -197,12 +210,13 @@ log.info('This is info message!', {hello: "world"})</code></pre>
       <h3>Events</h3>
       <p>Publish global events to which other sockets can subscribe.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {event} from 'syncano-server'</code></pre>
-      <h4>Usage</h4>
+      <pre><code class="lang-js">const {event} = new Server(ctx)</code></pre>
+      <h4>Emiting event</h4>
       <pre><code class="lang-js">event.emit('email_sent', {to: 'mail@example.com'})</code></pre>
-      <pre><code class="lang-yaml">event_handlers:
-  events.email_sent:
-    file: ./event-handlers/email-sent.js</code></pre>
+      <h4>Catching event</h4>
+      <pre data-type="socket"><code class="lang-yaml">event_handlers:
+  events.socket_name.email_sent:
+    file: email-sent.js</code></pre>
     </section>
     <!-- 
 
@@ -216,36 +230,37 @@ log.info('This is info message!', {hello: "world"})</code></pre>
 
       -->
       <h3>Sockets</h3>
-      <p>Get data from other sockets.</p>
+      <p>Call other socket enpoints.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {socket} from 'syncano-server'</code></pre>
+      <pre><code class="lang-js">const {socket} = new Server(ctx)</code></pre>
       <h4>Usage</h4>
-      <pre><code class="lang-js">socket.get('tags/list', { sort: 'latest' })
-socket.post('tags/create', { name: 'nature' })
-socket.delete('tags/delete', { id: 1 })</code></pre>
+      <pre><code class="lang-js">socket.get('tags/list', {sort: 'latest'})
+socket.post('tags/create', {name: 'nature'})
+socket.delete('tags/delete', {id: 1})</code></pre>
       <!-- 
 
       ==== Channels
 
       -->
       <h3>Channels</h3>
+      <p>Send messages to realtime channels.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {channel} from 'syncano-server'</code></pre>
+      <pre><code class="lang-js">const {channel} = new Server(ctx)</code></pre>
       <h4>Publishing to public channel</h4>
-      <pre><code class="lang-js">channel.publish('messages', {content: 'hello'})</code></pre>
-      <pre><code class="lang-yaml">endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages</code></pre>
+      <pre><code class="lang-js">channel.publish('messages', {content: 'hello'})</code></pre>
       <h4>Publishing to channel room</h4>
-      <pre><code class="lang-js">channel.publish(`messages.${room}`, {content: 'hello'})</code></pre>
-      <pre><code class="lang-yaml">endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages.{room}</code></pre>
+      <pre><code class="lang-js">channel.publish(`messages.${room}`, {content: 'hello'})</code></pre>
       <h4>Publishing to user private channel</h4>
-      <pre><code class="lang-js">channel.publish(`messages.${username}`, {content: 'hello'})</code></pre>
-      <pre><code class="lang-yaml">endpoints:
+      <pre data-type="socket"><code class="lang-yaml">endpoints:
   messages:
     channel: messages.{user}</code></pre>
+      <pre><code class="lang-js">channel.publish(`messages.${username}`, {content: 'hello'})</code></pre>
       <!-- 
 
       ==== Data & Users
@@ -254,11 +269,31 @@ socket.delete('tags/delete', { id: 1 })</code></pre>
       <h3>Data &amp; Users</h3>
       <p>Create, update, delete, list users and class object.</p>
       <h4>Import</h4>
-      <pre><code class="lang-js">import {data, users} from 'syncano-client'</code></pre>
+      <pre><code class="lang-js">const {data, users} = new Server(ctx)</code></pre>
       <h4>API</h4>
       <p>Users and Data share all methods.</p>
       <pre><code class="lang-js">users.method()
-data.class_name.method()</code></pre>
+  .then(res => {})
+  .catch(err => {})
+
+data.&lt;class_name&gt;.method()
+  .then(res => {})
+  .catch(err => {})</code></pre>
+      <h4>Example "posts" data class</h4>
+      <pre data-type="socket"><code class="lang-yaml">classes:
+  posts:
+    - name: title
+      type: string
+    - name: status
+      type: array
+      filter_index: true
+    - name: views
+      type: integer
+      filter_index: true</code></pre>
+      <div class="c-note">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/" version="1.1" x="0px" y="0px" width="56.6px" height="87.5px" viewBox="0 0 56.6 87.5" enable-background="new 0 0 56.6 87.5" xml:space="preserve"><path fill="#FFFFFF" d="M28.7 64.5c-1.4 0-2.5-1.1-2.5-2.5v-5.7 -5V41c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5v10.1 5 5.8C31.2 63.4 30.1 64.5 28.7 64.5zM26.4 0.1C11.9 1 0.3 13.1 0 27.7c-0.1 7.9 3 15.2 8.2 20.4 0.5 0.5 0.8 1 1 1.7l3.1 13.1c0.3 1.1 1.3 1.9 2.4 1.9 0.3 0 0.7-0.1 1.1-0.2 1.1-0.5 1.6-1.8 1.4-3l-2-8.4 -0.4-1.8c-0.7-2.9-2-5.7-4-8 -1-1.2-2-2.5-2.7-3.9C5.8 35.3 4.7 30.3 5.4 25 6.7 14.5 15.2 6.3 25.6 5.1c13.9-1.5 25.8 9.4 25.8 23 0 4.1-1.1 7.9-2.9 11.2 -0.8 1.4-1.7 2.7-2.7 3.9 -2 2.3-3.3 5-4 8L41.4 53l-2 8.4c-0.3 1.2 0.3 2.5 1.4 3 0.3 0.2 0.7 0.2 1.1 0.2 1.1 0 2.2-0.8 2.4-1.9l3.1-13.1c0.2-0.6 0.5-1.2 1-1.7 5-5.1 8.2-12.1 8.2-19.8C56.4 12 42.8-1 26.4 0.1zM43.7 69.6c0 0.5-0.1 0.9-0.3 1.3 -0.4 0.8-0.7 1.6-0.9 2.5 -0.7 3-2 8.6-2 8.6 -1.3 3.2-4.4 5.5-7.9 5.5h-4.1H28h-0.5 -3.6c-3.5 0-6.7-2.4-7.9-5.7l-0.1-0.4 -1.8-7.8c-0.4-1.1-0.8-2.1-1.2-3.1 -0.1-0.3-0.2-0.5-0.2-0.9 0.1-1.3 1.3-2.1 2.6-2.1H41C42.4 67.5 43.6 68.2 43.7 69.6zM37.7 72.5H26.9c-4.2 0-7.2 3.9-6.3 7.9 0.6 1.3 1.8 2.1 3.2 2.1h4.1 0.5 0.5 3.6c1.4 0 2.7-0.8 3.2-2.1L37.7 72.5z"></path></svg>
+        <p>Built-in fields: id, revision, created_at, updated_at</p>
+      </div>
       <h4>Creating</h4>
       <pre><code class="lang-js">// Create single post
 data.posts.create({title: 'Lorem ipsum'})
@@ -268,6 +303,13 @@ data.posts.create([
   {title: 'Lorem ipsum 1'},
   {title: 'Lorem ipsum 2'}
 ])</code></pre>
+    </section>
+    <!-- 
+
+    ==== Server 3
+
+    -->
+    <section data-tag="server" class="c-column">
       <h4>Updating</h4>
       <pre><code class="lang-js">// Update all objects
 data.posts.update({title: 'Lorem ipsum 1'})
@@ -285,13 +327,6 @@ data.posts.update([
 data.posts
   .where('status', 'in', ['draft', 'deleted'])
   .update({title: 'Lorem ipsum 1'})</code></pre>
-    </section>
-    <!-- 
-
-    ==== Server 3
-
-    -->
-    <section data-tag="server" class="c-column">
       <h4>Other Creation Methods</h4>
       <pre><code class="lang-js">// Get first tag with name 'ship' or create it
 // Second param holds additional data assigned to object
