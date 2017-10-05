@@ -32,9 +32,12 @@
       }
     })
 
-    document.querySelector('title').innerText = getTitle(tagName)
 
-    analytics.page();
+    const title = getTitle(tagName)
+
+    document.querySelector('title').innerText = title
+
+    window.analytics.page(tagName);
   }
 
   function getTitle(name) {
