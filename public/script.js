@@ -31,6 +31,19 @@
         tag.classList.remove('is-visible')
       }
     })
+
+    document.querySelector('title').innerText = getTitle(tagName)
+
+    analytics.page();
+  }
+
+  function getTitle(name) {
+    return 'Syncano Cheat Sheet - ' + {
+      client: 'Client',
+      server: 'Server',
+      cli: 'CLI',
+      socket: 'Socket'
+    }[name]
   }
 })()
 
