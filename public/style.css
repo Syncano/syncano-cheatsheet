@@ -129,18 +129,17 @@ code, pre {
   margin-top: 8px;
 }
 
-.c-note svg {
-  margin-right: 10px;
-  width: 18px;
-  height: 18px;
-  float: left;
-  margin-left: -35px;
-}
+  .c-note svg {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-left: -35px;
+  }
 
-.c-note p {
-  margin-top: 0;
-  color: #fff;
-}
+  .c-note p {
+    margin-top: 0;
+    color: #fff;
+  }
 
 [data-type] {
   position: relative;
@@ -195,7 +194,7 @@ pre[class*="language-"] {
   hyphens: none;
   -moz-osx-font-smoothing: initial;
   -webkit-font-smoothing: initial;
-  border-radius: 8px;
+  border-radius: 4px;
   color: #525252;
   display: block;
   overflow: auto;
@@ -219,6 +218,7 @@ pre[class*="language-"] {
   padding: 8px 12px;
   margin: 8px 0 0 0;
   overflow: auto;
+  box-shadow: 0 1px 1px rgba(0,0,0,.125);
 }
 
 :not(pre) > code[class*="language-"],
