@@ -38,7 +38,6 @@
     document.querySelector('title').innerText = title
 
     window.analytics.page(tagName);
-    console.log('page', tagName)
   }
 
   function getTitle(name) {
