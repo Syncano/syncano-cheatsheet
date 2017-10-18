@@ -303,13 +303,6 @@ data.posts.create([
   {title: 'Lorem ipsum 1'},
   {title: 'Lorem ipsum 2'}
 ])</code></pre>
-    </section>
-    <!-- 
-
-    ==== Server 3
-
-    -->
-    <section data-tag="server" class="c-column">
       <h4>Updating</h4>
       <pre><code class="lang-js">// Update all objects
 data.posts.update({title: 'Lorem ipsum 1'})
@@ -327,6 +320,13 @@ data.posts.update([
 data.posts
   .where('status', 'in', ['draft', 'deleted'])
   .update({title: 'Lorem ipsum 1'})</code></pre>
+    </section>
+    <!-- 
+
+    ==== Server 3
+
+    -->
+    <section data-tag="server" class="c-column">
       <h4>Other Creation Methods</h4>
       <pre><code class="lang-js">// Get first tag with name 'ship' or create it
 // Second param holds additional data assigned to object
@@ -383,7 +383,15 @@ data.posts.where('views', '>', 200).list()
 data.posts.where('status', 'in', ['draft', 'published']).list()
 
 // Get all posts with id not in given array
-data.posts.where('id', 'nin', [10, 20]).list()</code></pre>
+data.posts.where('id', 'nin', [10, 20]).list()
+
+// Get all published posts with id between 100 and 200
+data.posts
+  .where([
+    ['id', 'gt', 100],
+    ['id', 'lt', 200]
+    ['status', 'published']
+  ]).list()</code></pre>
       <h4>Ordering, Limit, & Offset</h4>
       <pre><code class="lang-js">// Get all posts ordered descending by creation date
 data.posts.orderBy('created_at', 'DESC').list()
