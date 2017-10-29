@@ -312,8 +312,8 @@ data.posts.update(14, {title: 'Lorem ipsum 1'})
 
 // Update multiple objects
 data.posts.update([
-  14, {title: 'Lorem ipsum 1'},
-  15, {title: 'Lorem ipsum 1'}
+  [14, {title: 'Lorem ipsum 1'}],
+  [15, {title: 'Lorem ipsum 1'}]
 ])
 
 // Update all objects matching query
@@ -369,6 +369,7 @@ data.posts.findOrFail(15)
 // Get first object with views > 100 or throw error
 data.posts.where('views', '>', 100).firstOrFail())</code></pre>
       <h4>Filtering</h4>
+      <p>Add `filter_index` to the desired field to use methods below</p>
       <pre><code class="lang-js">// Get all posts with views = 100
 data.posts.where('views', '=', 100).list()
 
@@ -393,6 +394,7 @@ data.posts
     ['status', 'published']
   ]).list()</code></pre>
       <h4>Ordering, Limit, & Offset</h4>
+      <p>Add `order_index` to the desired field to use methods below</p>
       <pre><code class="lang-js">// Get all posts ordered descending by creation date
 data.posts.orderBy('created_at', 'DESC').list()
 
